@@ -458,6 +458,10 @@ module Stomp
           slog(:on_ssl_connecting, log_params)
           # _dump_ctx(ctx)
           Timeout::timeout(@connect_timeout, Stomp::Error::SocketOpenTimeout) do
+            if RUBY_VERSION =~ /2\.2/
+              ctx.ssl_version = :TLSv1_2
+            end
+            
             tcp_socket = TCPSocket.open(@host, @port)
             ssl = OpenSSL::SSL::SSLSocket.new(tcp_socket, ctx)
             ssl.hostname = @host if ssl.respond_to? :hostname=
